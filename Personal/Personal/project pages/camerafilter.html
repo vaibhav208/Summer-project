@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Camera Filter App</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            color: #343a40;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            margin: 20px 0;
+            color: #495057;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: #ffffff;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .button:hover {
+            background-color: #0056b3;
+        }
+
+        .button:active {
+            transform: scale(0.98);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin: 10px 0;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .section {
+            margin-bottom: 20px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            justify-items: center;
+        }
+
+        .grid-item {
+            text-align: center;
+        }
+
+        .caption {
+            font-size: 18px;
+            margin-top: 10px;
+            color: #6c757d;
+        }
+    </style>
+    <script>
+        async function captureImage() {
+            try {
+                const response = await fetch('/capture');
+                const data = await response.json();
+                document.getElementById('capturedImage').src = data.image_path;
+                document.getElementById('capturedImage').classList.remove('hidden');
+                document.getElementById('imagePath').value = data.image_path;
+            } catch (error) {
+                console.error('Error capturing image:', error);
+            }
+        }
+
+        async function applyFilter(filterType) {
+            const imagePath = document.getElementById('imagePath').value;
+            if (!imagePath) {
+                alert('No image captured!');
+                return;
+            }
+
+            try {
+                const response = await fetch(`/apply_${filterType}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ image_path: imagePath }),
+                });
+                const data = await response.json();
+                if (data.error) {
+                    alert(data.error);
+                } else {
+                    const filteredImagePath = data.filtered_image_path;
+                    document.getElementById('filteredImage').src = filteredImagePath;
+                    document.getElementById('filteredImage').classList.remove('hidden');
+                }
+            } catch (error) {
+                console.error(`Error applying ${filterType} filter:`, error);
+            }
+        }
+
+        function downloadImage() {
+            const filteredImagePath = document.getElementById('filteredImage').src;
+            if (!filteredImagePath) {
+                alert('No filtered image available!');
+                return;
+            }
+            window.location.href = `/download/${filteredImagePath}`;
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Camera Filter Application</h1>
+
+        <div class="section">
+            <button class="button" onclick="captureImage()">Capture Image</button>
+            <input type="hidden" id="imagePath" value="">
+        </div>
+
+        <div class="grid">
+            <div class="grid-item">
+                <h2 class="caption">Captured Image:</h2>
+                <img id="capturedImage" class="hidden" alt="Captured Image">
+            </div>
+
+            <div class="grid-item">
+                <h2 class="caption">Apply Filters:</h2>
+                <button class="button" onclick="applyFilter('sunglasses')">Apply Sunglasses</button>
+                <button class="button" onclick="applyFilter('stars')">Apply Stars</button>
+            </div>
+
+            <div class="grid-item">
+                <h2 class="caption">Filtered Image:</h2>
+                <img id="filteredImage" class="hidden" alt="Filtered Image">
+            </div>
+
+            <div class="grid-item">
+                <button class="button" onclick="downloadImage()">Download Filtered Image</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

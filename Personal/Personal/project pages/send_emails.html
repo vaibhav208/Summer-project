@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Send Bulk Emails</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        input, textarea, button {
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #bulkEmailStatus {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Send Bulk Emails</h1>
+        <form id="bulkEmailForm">
+            <input type="text" id="subject" placeholder="Subject" required>
+            <textarea id="body" placeholder="Body" required></textarea>
+            <textarea id="recipients" placeholder="Recipients (comma separated)" required></textarea>
+            <button type="submit">Send Emails</button>
+        </form>
+        <div id="bulkEmailStatus"></div>
+    </div>
+    <script>
+        document.getElementById('bulkEmailForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const subject = document.getElementById('subject').value;
+            const body = document.getElementById('body').value;
+            const recipients = document.getElementById('recipients').value.split(',').map(recipient => recipient.trim());
+
+            fetch('http://localhost:80/send_emails', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ subject: subject, body: body, recipients: recipients })
+            })
+            .then(response => response.json())
+            .then(data => {
+                const statusDiv = document.getElementById('bulkEmailStatus');
+                statusDiv.innerHTML = `<p>${data.message || data.error}</p>`;
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Current Location</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        button {
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            background-color: #007bff;
+            color: #fff;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #locationDetails {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Get Current Location</h1>
+        <button id="getLocation">Get Location</button>
+        <div id="locationDetails"></div>
+    </div>
+    <script>
+        document.getElementById('getLocation').addEventListener('click', function() {
+            fetch('http://localhost:80/get-location')
+                .then(response => response.json())
+                .then(data => {
+                    const locationDiv = document.getElementById('locationDetails');
+                    locationDiv.innerHTML = `
+                        <p><strong>IP:</strong> ${data.ip}</p>
+                        <p><strong>City:</strong> ${data.city}</p>
+                        <p><strong>Region:</strong> ${data.region}</p>
+                        <p><strong>Country:</strong> ${data.country}</p>
+                        <p><strong>Location:</strong> ${data.location}</p>
+                    `;
+                })
+                .catch(error => console.error('Error:', error));
+        });
+    </script>
+</body>
+</html>

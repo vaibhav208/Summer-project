@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Send Email</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        input, textarea, button {
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #emailStatus {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Send Email</h1>
+        <form id="emailForm">
+            <input type="email" id="receiver_email" placeholder="Recipient's email" required>
+            <input type="text" id="subject" placeholder="Subject" required>
+            <textarea id="body" placeholder="Body" required></textarea>
+            <button type="submit">Send Email</button>
+        </form>
+        <div id="emailStatus"></div>
+    </div>
+    <script>
+        document.getElementById('emailForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const receiverEmail = document.getElementById('receiver_email').value;
+            const subject = document.getElementById('subject').value;
+            const body = document.getElementById('body').value;
+            
+            fetch('http://localhost:80/send_email', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ receiver_email: receiverEmail, subject: subject, body: body })
+            })
+            .then(response => response.json())
+            .then(data => {
+                const statusDiv = document.getElementById('emailStatus');
+                statusDiv.innerHTML = `<p>${data.message || data.error}</p>`;
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    </script>
+</body>
+</html>

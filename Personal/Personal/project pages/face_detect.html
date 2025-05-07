@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Face Detection App</title>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            text-align: center;
+            padding: 20px;
+            margin: 0;
+        }
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            color: #4CAF50;
+        }
+        #capture {
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px 30px;
+            font-size: 1.2em;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        #capture:hover {
+            background-color: #45a049;
+        }
+        #output {
+            margin-top: 30px;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 15px;
+            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+
+<h1>Face Detection Application</h1>
+
+<button id="capture">Capture & Process Image</button>
+
+<div id="output">
+    <h3>Processed Image:</h3>
+    <img id="processed-image" src="" alt="Processed Image will appear here">
+</div>
+
+<script>
+    document.getElementById('capture').addEventListener('click', function() {
+        fetch('http://localhost:80/capture', {
+            method: 'POST'
+        })
+        .then(response => {
+            if (response.ok) {
+                return response.blob();
+            } else {
+                return response.json().then(data => {
+                    alert(data.error);
+                    throw new Error(data.error);
+                });
+            }
+        })
+        .then(blob => {
+            const imgElement = document.getElementById('processed-image');
+            imgElement.src = URL.createObjectURL(blob);
+        })
+        .catch(error => console.error('Error:', error));
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Camera Access and Capture Photo</title>
+    <style>
+        #video {
+            width: 100%;
+            max-width: 400px;
+        }
+        #canvas {
+            display: none;
+        }
+        #photo {
+            width: 100%;
+            max-width: 400px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Camera Access and Capture Photo</h1>
+    <video id="video" autoplay></video>
+    <button id="capture-btn">Capture Photo</button>
+    <canvas id="canvas"></canvas>
+    <img id="photo" alt="Captured Photo">
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const video = document.getElementById('video');
+            const canvas = document.getElementById('canvas');
+            const photo = document.getElementById('photo');
+            const captureBtn = document.getElementById('capture-btn');
+            const context = canvas.getContext('2d');
+
+            // Access the camera
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then((stream) => {
+                    video.srcObject = stream;
+                })
+                .catch((err) => {
+                    console.error('Error accessing the camera: ', err);
+                });
+
+            // Capture the photo when the button is clicked
+            captureBtn.addEventListener('click', () => {
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                // Convert the canvas to a data URL and display it
+                const dataUrl = canvas.toDataURL('image/png');
+                photo.src = dataUrl;
+                photo.style.display = 'block';
+            });
+        });
+    </script>
+</body>
+</html>
